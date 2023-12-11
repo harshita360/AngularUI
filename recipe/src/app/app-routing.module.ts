@@ -5,17 +5,19 @@ import { RecipeEditComponent } from './recipes/recipe-edit/recipe-edit.component
 import { RecipeStartComponent } from './recipes/recipe-start/recipe-start.component';
 import { RecipesComponent } from './recipes/recipes.component';
 import { ShoppingListComponent } from './shopping-list/shopping-list.component';
+import { RecipeResolverService } from './recipes/recipes-resolver.service';
 
 const routes: Routes = [
   {path:'',redirectTo:'/recipes', pathMatch:'full'},
   {path:'recipes', component:RecipesComponent, children:[
     {path:'', component:RecipeStartComponent },//for the route just /recipe
     {path: 'new', component:RecipeEditComponent},
-    {path: ':id', component:RecipeDetailComponent },
-    {path: ':id/edit', component:RecipeEditComponent},
+    {path: ':id', component:RecipeDetailComponent,resolve:[RecipeResolverService] },
+    {path: ':id/edit', component:RecipeEditComponent, resolve:[RecipeResolverService]},
   ]},
   {path:'shopping-list', component:ShoppingListComponent}
 ];
+//through the resolver we run the fetchRecipes method whenever edit / detail compoennt component is loaded
 
 @NgModule({
   imports: [RouterModule.forRoot(routes)],

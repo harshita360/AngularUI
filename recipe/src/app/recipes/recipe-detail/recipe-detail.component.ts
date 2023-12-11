@@ -15,6 +15,8 @@ export class RecipeDetailComponent implements OnInit {
   id: number;
   constructor(private recipeService:RecipeService, private route:ActivatedRoute,private router: Router) { }
 
+  //resolver: piece of code that runs before a component is loaded to check if certain data that the
+  //route depends on is there
   ngOnInit(): void {
     this.route.params.subscribe(
       (params)=>{

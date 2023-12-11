@@ -14,7 +14,7 @@ export class HeaderComponent {
   }
 
   onFetchData(){
-    this.dataStorageService.fetchRecipes();
+    this.dataStorageService.fetchRecipes().subscribe();
   }
 //@Output() featureSelect = new EventEmitter<string>(); // we attach this property to the component which will use this property
 

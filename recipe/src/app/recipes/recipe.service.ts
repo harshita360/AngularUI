@@ -8,18 +8,21 @@ export class RecipeService{
 
    // recipeSelected = new EventEmitter<Recipe>();
    recipesChanged = new EventEmitter<Recipe[]>();
-    private recipes:Recipe[]=[
-        new Recipe("A test Recipe","This is test","https://en.wikipedia.org/wiki/Bruschetta#/media/File:2014_Bruschetta_The_Larder_Chiang_Mai.jpg", [new Ingredient("Tomatoes",5)]),
-        new Recipe("Another test Recipe2","This is test","https://en.wikipedia.org/wiki/Bruschetta#/media/File:2014_Bruschetta_The_Larder_Chiang_Mai.jpg", [new Ingredient("Potato",7)]),
+    // private recipes:Recipe[]=[
+    //     new Recipe("A test Recipe","This is test","https://en.wikipedia.org/wiki/Bruschetta#/media/File:2014_Bruschetta_The_Larder_Chiang_Mai.jpg", [new Ingredient("Tomatoes",5)]),
+    //     new Recipe("Another test Recipe2","This is test","https://en.wikipedia.org/wiki/Bruschetta#/media/File:2014_Bruschetta_The_Larder_Chiang_Mai.jpg", [new Ingredient("Potato",7)]),
         
-      ]; 
+    //   ]; 
+
+    private recipes: Recipe[]=[];
     
     constructor(private shoppingListService:ShoppingListService)  {}
 
-    // setRecipes(recipes:Recipe[]){
-    //  this.recipes=recipes;
-    //  this.
-    // }
+    setRecipes(recipes:Recipe[]){
+     this.recipes=recipes;
+     this.recipesChanged.emit(this.recipes.slice());
+
+    }
     getRecipes(){
      return this.recipes.slice(); //returns a copy of the recipes array
      //return this.recipes this is not recommeneded as we shouldn't be able to directly access the recipe list from outside 
