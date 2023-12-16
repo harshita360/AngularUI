@@ -20,28 +20,19 @@ export class DataStorageService{
     }
 
     fetchRecipes(){
-        //take is an rxjs operator that we need to tell that we want to tske only on e value from that observable and then unsubscribe.
-        //exhaustMap waits for the user observable to complete, that is user observable.
-        //the user observable is next replaced with observale returned insoide exhaustmap function
-        return this.authService.user.pipe(
-            take(1), 
-            exhaustMap( user => {
-            return this.http.get<Recipe[]>('https://projectrecipe-6b622-default-rtdb.firebaseio.com/recipes.json',
-            {
-                params: new HttpParams().set('auth',user.getToken())// pass the token as a query parameter
-            }
-            );
-        }),
-        map(recipes =>{
-            return recipes.map(recipe=>{
-                return {
-                    ...recipe, ingredients:recipe.ingredients? recipe.ingredients:[]
-                };
-            });
-    }),tap(recipes =>{
-        this.recipeService.setRecipes(recipes);
-    })
-    );
+        return this.http.get<Recipe[]>('https://projectrecipe-6b622-default-rtdb.firebaseio.com/recipes.json'
+        ).pipe(
+            map(recipes =>{
+                return recipes.map(recipe=>{
+                    return {
+                        ...recipe, ingredients:recipe.ingredients? recipe.ingredients:[]
+                    };
+                });
+        }),tap(recipes =>{
+            this.recipeService.setRecipes(recipes);
+        })
+        )
+    } 
     
         //make sure ingredient property is not undefined
         // return this.http.get<Recipe[]>('https://projectrecipe-6b622-default-rtdb.firebaseio.com/recipes.json').pipe(map(recipes =>{
@@ -54,5 +45,5 @@ export class DataStorageService{
         // })
         // )
     
-}//Where to subcribe learn in video 286
+//Where to subcribe learn in video 286
 }
