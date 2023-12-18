@@ -2,6 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import {EventEmitter, Injectable} from '@angular/core';
 import { BehaviorSubject, catchError, tap, throwError } from 'rxjs';
 import { User } from './user.model';
+import { Router } from '@angular/router';
 
 interface AuthResponseData{
   kind:string;
@@ -20,8 +21,8 @@ export class AuthService{
 //user = new EventEmitter<User>();
 user = new BehaviorSubject<User>(null); // allows us to access the user event if we want to access it at a different point of time when we suscribed to the object
 //for eg, we want to fetch the token field of the user only when user click fetch/store data option to see if he is allowed. hence we can pull token even though we subcribed to the user before.
-
-constructor(private http:HttpClient){}
+private tokenExpirationTimer:any;
+constructor(private http:HttpClient, private router:Router){}
 
 
 signin(email:string,password:string){
@@ -78,9 +79,49 @@ signup(email:string, password:string){
 }
 //throwError from rxjs returns the error wrapped in an observable.
 
+
 private handleAuthentication(email:string, userId:string, token:string,expiresIn:number){
   const expirationDate = new Date(new Date().getTime() + expiresIn*1000); //expirationDate is in milliseconds as returned by firebase. hence compare like that. Gettime returns the milliseconds over from 1970 to now.
   const user = new User(email,userId,token,expirationDate);
   this.user.next(user);
+  this.autoLogout(expiresIn*1000);
+  localStorage.setItem('userData',JSON.stringify(user));
+}
+
+autoLogin(){
+  const userData:{
+    email:string;
+    id:string;
+    _token:string;
+    _tokenExpirationDate: string;
+  } = JSON.parse(localStorage.getItem('userData'));
+  if(!userData){
+    return;
+  }
+  const loadedUser = new User(userData.email, userData.id,userData._token,new Date(userData._tokenExpirationDate));
+  if(loadedUser.getToken){
+    this.user.next(loadedUser);
+    //here have to calculate how much time we have for session timeout
+    const expirationDuration = new Date(userData._tokenExpirationDate).getTime() - new Date().getTime();
+    this.autoLogout(expirationDuration);
+  }
+
+}
+
+autoLogout(expirationDuration:number){//get millisecond as an argument
+  this.tokenExpirationTimer = setTimeout(()=>{//set timeout returns reference to timer
+    this.logout(); 
+  },expirationDuration)// second argument sets timer so that first argument function is called
+}
+
+logout(){
+  this.user.next(null);
+  this.router.navigate(['/auth']);
+  localStorage.removeItem('userData');
+  //check if we have a active timer, if yes then remove it. Because it will lead to another logout when session expires if user manually logged out.
+  if(this.tokenExpirationTimer){
+    clearTimeout(this.tokenExpirationTimer);
+  }
+  this.tokenExpirationTimer= null;
 }
 }

@@ -23,6 +23,10 @@ export class HeaderComponent implements OnInit{
   onFetchData(){
     this.dataStorageService.fetchRecipes().subscribe();
   }
+
+  logout(){
+    this.authService.logout();
+  }
 //@Output() featureSelect = new EventEmitter<string>(); // we attach this property to the component which will use this property
 
 

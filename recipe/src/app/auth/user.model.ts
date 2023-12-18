@@ -8,7 +8,7 @@ export class User{
 
     }
 
-    getToken(){
+   get getToken(){
         if(!this._tokenExpirationDate || new Date() > this._tokenExpirationDate){
             return null;
         }
